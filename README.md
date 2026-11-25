@@ -4,9 +4,7 @@ Laboratório de Active Directory **como código** para praticar o ciclo completo
 
 > **Estado: semana 0 (teste de viabilidade).** Este repositório é o esqueleto: a estrutura, os modelos e os testes automáticos já estão prontos, e o conteúdo vai sendo preenchido semana a semana. O que ainda não está feito está por marcar na lista de entregáveis.
 
-<!-- Depois de criares o repositório no GitHub, descomenta as duas linhas seguintes e troca O-TEU-UTILIZADOR pelo teu nome de utilizador:
-[![detections](https://github.com/O-TEU-UTILIZADOR/ribeira-purple-lab/actions/workflows/detections.yml/badge.svg)](https://github.com/O-TEU-UTILIZADOR/ribeira-purple-lab/actions/workflows/detections.yml)
--->
+
 
 ## A ideia numa frase
 

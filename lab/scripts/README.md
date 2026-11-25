@@ -20,7 +20,7 @@ O DC01 está em modo Core, sem ambiente gráfico: abre o PowerShell com `powersh
 ```powershell
 # Opção A: depois de o repositório estar público no GitHub (troca o nome de utilizador)
 Invoke-WebRequest -UseBasicParsing -OutFile 01-rede-e-nome.ps1 `
-    https://raw.githubusercontent.com/O-TEU-UTILIZADOR/ribeira-purple-lab/main/lab/scripts/01-rede-e-nome.ps1
+    https://raw.githubusercontent.com/lucasbaccoistec/ribeira-purple-lab/main/lab/scripts/01-rede-e-nome.ps1
 
 # Opção B: a partir do Mac. Na pasta lab/scripts corre "python3 -m http.server 8000";
 # na rede partilhada do UTM o Mac costuma ser o endereço .1 (confirma no gateway do ipconfig).
