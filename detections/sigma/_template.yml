@@ -1,0 +1,39 @@
+---
+# MODELO DE REGRA SIGMA. Os ficheiros que começam por "_" não entram nos testes.
+#
+# Para criar uma regra nova:
+#   1. Copia este ficheiro para um nome sem "_" (ex.: grupo_privilegiado_alterado.yml).
+#   2. Gera um id novo:  python3 -c "import uuid; print(uuid.uuid4())"
+#   3. Preenche os campos e acrescenta casos de teste em detections/tests/cases.yml.
+#   4. Corre "make check".
+title: Modelo - membro adicionado a um grupo privilegiado
+id: 389be846-a91e-44c9-b32c-cc0e1a66ef17
+status: experimental
+description: >
+  Escreve aqui, em linguagem simples, o que a regra apanha e porque é suspeito.
+references:
+  - https://attack.mitre.org/techniques/T1098/
+author: O Teu Nome
+date: 2026-11-25
+tags:
+  - attack.persistence
+  - attack.t1098
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID:
+      - 4728
+      - 4732
+      - 4756
+  filter_expected:
+    SubjectUserName: conta-de-administracao-esperada
+  condition: selection and not filter_expected
+fields:
+  - SubjectUserName
+  - MemberSid
+  - TargetUserName
+falsepositives:
+  - Administradores a gerir grupos numa alteração autorizada
+level: medium

@@ -1,0 +1,40 @@
+---
+- name: Fixar o nome da máquina
+  ansible.windows.win_hostname:
+    name: "{{ inventory_hostname }}"
+  register: ribeira_hostname
+
+- name: Reiniciar se o nome mudou
+  ansible.windows.win_reboot:
+  when: ribeira_hostname.reboot_required
+
+- name: Acertar o fuso horário
+  ansible.windows.win_timezone:
+    timezone: "{{ ribeira_timezone }}"
+
+- name: Ativar as auditorias de que as regras de deteção precisam
+  ansible.windows.win_audit_policy_system:
+    subcategory: "{{ item }}"
+    audit_type:
+      - success
+      - failure
+  loop: "{{ ribeira_audit_subcategories }}"
+
+- name: Registar a linha de comandos dos processos novos (evento 4688)
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System\Audit
+    name: ProcessCreationIncludeCmdLine_Enabled
+    data: 1
+    type: dword
+
+- name: Registar o conteúdo dos scripts PowerShell (evento 4104)
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging
+    name: EnableScriptBlockLogging
+    data: 1
+    type: dword
+
+- name: Aumentar o registo de segurança para os eventos não se perderem
+  ansible.windows.win_eventlog:
+    name: Security
+    maximum_size: 512MB

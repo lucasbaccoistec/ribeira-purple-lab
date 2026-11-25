@@ -1,0 +1,17 @@
+---
+extends: default
+
+rules:
+  line-length:
+    max: 140
+    level: warning
+  truthy:
+    check-keys: false
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+
+ignore: |
+  .venv/
+  .tools/
+  lab/ansible/collections/

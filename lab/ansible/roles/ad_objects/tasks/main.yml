@@ -1,0 +1,35 @@
+---
+- name: Criar as unidades organizacionais dos departamentos
+  microsoft.ad.ou:
+    name: "{{ item }}"
+    path: "{{ ribeira_base_dn }}"
+    state: present
+  loop: "{{ ribeira_departments }}"
+
+- name: Criar um grupo por departamento
+  microsoft.ad.group:
+    name: "GRP-{{ item }}"
+    scope: global
+    path: "OU={{ item }},{{ ribeira_base_dn }}"
+    state: present
+  loop: "{{ ribeira_departments }}"
+
+- name: Criar os utilizadores da empresa
+  microsoft.ad.user:
+    name: "{{ item.first }} {{ item.last }}"
+    sam_account_name: "{{ item.sam }}"
+    upn: "{{ item.sam }}@{{ ribeira_domain }}"
+    firstname: "{{ item.first }}"
+    surname: "{{ item.last }}"
+    password: "{{ ribeira_user_password }}"
+    update_password: on_create
+    path: "OU={{ item.department }},{{ ribeira_base_dn }}"
+    groups:
+      set:
+        - "GRP-{{ item.department }}"
+    enabled: true
+    state: present
+  loop: "{{ ribeira_users }}"
+  loop_control:
+    label: "{{ item.sam }}"
+  no_log: true

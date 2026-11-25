@@ -1,0 +1,17 @@
+---
+- name: O posto de trabalho usa o DNS do controlador de domínio
+  ansible.windows.win_dns_client:
+    adapter_names: "*"
+    dns_servers:
+      - "{{ ribeira_dc_ip }}"
+
+# Na semana 0 o WS01 já foi juntado ao domínio à mão; aqui só se confirma (não muda nada).
+- name: Garantir que o posto de trabalho está no domínio
+  microsoft.ad.membership:
+    dns_domain_name: "{{ ribeira_domain }}"
+    hostname: "{{ inventory_hostname }}"
+    domain_admin_user: "Administrator@{{ ribeira_domain }}"
+    domain_admin_password: "{{ ribeira_admin_password }}"
+    state: domain
+    reboot: true
+  no_log: true

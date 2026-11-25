@@ -1,0 +1,48 @@
+---
+# A empresa fictícia
+ribeira_domain: ribeira.test
+ribeira_netbios: RIBEIRA
+ribeira_base_dn: "DC={{ ribeira_domain.split('.') | join(',DC=') }}"
+ribeira_dc_ip: 192.168.64.10
+ribeira_dns_forwarder: 1.1.1.1
+ribeira_timezone: GMT Standard Time
+
+# Autoridade de certificação (bónus da semana 0). Põe false para saltar esta parte.
+ribeira_install_adcs: true
+ribeira_ca_name: Ribeira-CA
+
+# Palavras-passe: lidas do ambiente, nunca escritas em ficheiros do Git.
+ribeira_admin_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_LAB_PASSWORD') }}"
+ribeira_dsrm_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_DSRM_PASSWORD') }}"
+ribeira_user_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_LAB_PASSWORD') }}"
+
+# Auditorias de que as regras de deteção precisam (nomes em inglês, como no Windows em English).
+ribeira_audit_subcategories:
+  - Credential Validation
+  - Kerberos Authentication Service
+  - Kerberos Service Ticket Operations
+  - Computer Account Management
+  - User Account Management
+  - Security Group Management
+  - Directory Service Access
+  - Directory Service Changes
+  - Certification Services
+  - Logon
+  - Special Logon
+  - Process Creation
+
+# Departamentos (viram unidades organizacionais e grupos)
+ribeira_departments:
+  - Administracao
+  - Financeiro
+  - RecursosHumanos
+  - Comercial
+  - TI
+
+# Pessoas da empresa (nomes inventados)
+ribeira_users:
+  - { sam: ana.ferreira, first: Ana, last: Ferreira, department: Administracao }
+  - { sam: bruno.costa, first: Bruno, last: Costa, department: Financeiro }
+  - { sam: carla.sousa, first: Carla, last: Sousa, department: RecursosHumanos }
+  - { sam: diogo.lopes, first: Diogo, last: Lopes, department: Comercial }
+  - { sam: eva.martins, first: Eva, last: Martins, department: TI }

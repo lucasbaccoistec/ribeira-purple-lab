@@ -1,0 +1,50 @@
+---
+# Playbook principal do laboratório. Corre-se a partir do Mac:
+#   cd lab/ansible && ansible-playbook site.yml
+# Uma etapa de cada vez: ansible-playbook site.yml --tags common   (ou domain, adcs, objects, workstation)
+
+- name: Verificar o que é preciso antes de começar
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Confirmar que as palavras-passe de laboratório estão no ambiente
+      ansible.builtin.assert:
+        that:
+          - ribeira_admin_password | length >= 12
+          - ribeira_dsrm_password | length >= 12
+        fail_msg: >-
+          Define RIBEIRA_LAB_PASSWORD e RIBEIRA_DSRM_PASSWORD no terminal
+          (mínimo 12 caracteres) antes de correr o playbook.
+        quiet: true
+      tags: always
+
+- name: Base comum a todas as máquinas Windows (nome, hora, auditorias)
+  hosts: windows
+  roles:
+    - role: common
+      tags: common
+
+- name: Controlador de domínio
+  hosts: domain_controllers
+  roles:
+    - role: domain_controller
+      tags: domain
+    - role: adcs
+      when: ribeira_install_adcs | bool
+      tags: adcs
+    - role: ad_objects
+      tags: objects
+
+- name: Posto de trabalho
+  hosts: workstations
+  roles:
+    - role: workstation
+      tags: workstation
+
+# As fraquezas propositadas só entram quando as definires (ver docs/vulnerability-register.md).
+- name: Fraquezas propositadas da Ribeira
+  hosts: domain_controllers:workstations
+  roles:
+    - role: misconfigurations
+      tags: [misconfigurations, never]

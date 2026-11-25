@@ -1,0 +1,43 @@
+---
+name: detections
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "detections/**"
+      - "Makefile"
+      - "requirements.txt"
+      - ".github/workflows/detections.yml"
+  pull_request:
+    paths:
+      - "detections/**"
+      - "Makefile"
+      - "requirements.txt"
+      - ".github/workflows/detections.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Instalar o sigma-cli
+        run: pip install sigma-cli
+
+      - name: Validar a sintaxe das regras Sigma
+        run: make sigma-check
+
+      - name: Descarregar o Chainsaw
+        run: make tools
+
+      - name: Testar as regras contra os EVTX do laboratório
+        run: make test-detections

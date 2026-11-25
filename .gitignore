@@ -1,0 +1,24 @@
+# ISOs e discos de máquinas virtuais: nunca vão para o GitHub
+*.iso
+*.qcow2
+*.vhd
+*.vhdx
+*.vmdk
+*.utm/
+
+# Segredos e configuração local
+.env
+*.key
+vault-password*
+lab/ansible/inventory.yml
+
+# Ambiente local
+.venv/
+.tools/
+__pycache__/
+lab/ansible/collections/
+.DS_Store
+
+# Saídas geradas
+report/build/
+detections/tests/.generated-mapping.yml

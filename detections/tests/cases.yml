@@ -1,0 +1,28 @@
+---
+# Casos de teste das regras de deteção.
+#
+# Cada caso liga UMA regra a UMA amostra de eventos (.evtx, ou uma pasta delas):
+#
+#   rule:     ficheiro da regra (caminho a partir da raiz do repositório, ou só o
+#             nome do ficheiro dentro de detections/sigma/)
+#   sample:   ficheiro .evtx (ou pasta) a partir da raiz do repositório
+#   expect:   match     -> a regra TEM de disparar (apanha o ataque)
+#             no-match  -> a regra NÃO pode disparar (apanha falsos positivos)
+#   min_hits: opcional, só para match. Mínimo de eventos que têm de disparar (por omissão, 1)
+#   name:     opcional, texto que aparece no relatório
+#
+# Regra da casa: toda a regra em detections/sigma/ precisa de pelo menos um caso "match".
+#
+# Exemplo (descomenta quando tiveres a regra e a amostra):
+#
+# cases:
+#   - name: Utilizador comum pede um ticket Kerberos de serviço (deve disparar)
+#     rule: kerberos_ticket_pedido_suspeito.yml
+#     sample: detections/samples/evtx/kerberos/ataque.evtx
+#     expect: match
+#   - name: Utilizador comum pede um ticket Kerberos de serviço (tráfego normal)
+#     rule: kerberos_ticket_pedido_suspeito.yml
+#     sample: detections/samples/evtx/kerberos/normal.evtx
+#     expect: no-match
+
+cases: []

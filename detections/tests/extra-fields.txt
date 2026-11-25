@@ -1,0 +1,20 @@
+# Campos de eventos Windows que o mapeamento oficial do Chainsaw não conhece.
+#
+# Porque é que isto existe: o Chainsaw só consegue comparar os campos que estão
+# no ficheiro de mapeamento. Se uma regra usar um campo que lá não está, o
+# Chainsaw não dá erro: simplesmente nunca dispara, e o teste passaria em branco.
+# O run_tests.py avisa quando uma regra usa um campo desconhecido.
+#
+# Como se usa: escreve um nome de campo por linha, tal como aparece em
+# Event.EventData no evento (ex.: no Visualizador de Eventos, separador Detalhes).
+# O run_tests.py junta estas linhas ao mapeamento do Chainsaw ao correr.
+# Linhas a começar por # e linhas vazias são ignoradas.
+
+Attributes
+CertificateTemplate
+EnabledPrivilegeList
+FailureReason
+ObjectDN
+Requester
+RequesterName
+TransmittedServices

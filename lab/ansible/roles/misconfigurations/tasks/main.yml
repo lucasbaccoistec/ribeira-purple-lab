@@ -1,0 +1,15 @@
+---
+# Fraquezas propositadas da Ribeira. Esta role fica vazia até as definires.
+#
+# Como acrescentar uma fraqueza (um passo de cada vez):
+#   1. Escreve primeiro a linha em docs/vulnerability-register.md (o quê, porquê, como se deteta, como se corrige).
+#   2. Cria aqui um bloco com uma tag própria (ex.: vuln_001) e uma variável ribeira_weak_vuln_001.
+#      Com a variável a true o bloco põe a configuração fraca; com false põe a configuração corrigida.
+#      Assim "Corrigir e Provar" é só mudar a variável e voltar a correr o mesmo playbook.
+#   3. Nunca ponhas palavras-passe nem chaves no Git: lê-as do ambiente, como em group_vars/all.yml.
+#
+# Esta role só corre quando pedires de propósito (a tag "never" no site.yml):
+#   ansible-playbook site.yml --tags misconfigurations
+- name: Mostrar quantas fraquezas propositadas estão definidas
+  ansible.builtin.debug:
+    msg: "Fraquezas propositadas definidas: 0 (ver docs/vulnerability-register.md)"

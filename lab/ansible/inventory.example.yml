@@ -1,0 +1,27 @@
+---
+# Copia este ficheiro para inventory.yml (o Git ignora-o) e ajusta os endereços IP
+# ao que o teu UTM atribuiu. As palavras-passe nunca se escrevem aqui: vêm do ambiente.
+#
+#   export RIBEIRA_LAB_PASSWORD='...'    # palavra-passe do Administrator (DC01 e domínio)
+#   export RIBEIRA_DSRM_PASSWORD='...'   # palavra-passe do modo de restauro do diretório
+all:
+  children:
+    windows:
+      vars:
+        ansible_connection: winrm
+        ansible_port: 5985
+        ansible_winrm_scheme: http
+        ansible_winrm_transport: ntlm
+        ansible_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_LAB_PASSWORD') }}"
+      children:
+        domain_controllers:
+          hosts:
+            DC01:
+              ansible_host: 192.168.64.10
+              ansible_user: Administrator
+        workstations:
+          hosts:
+            WS01:
+              # Troca pelo endereço que o WS01 tem (ipconfig). O WS01 já tem de estar no domínio.
+              ansible_host: 192.168.64.20
+              ansible_user: RIBEIRA\Administrator

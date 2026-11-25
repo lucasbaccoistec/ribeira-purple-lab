@@ -1,0 +1,21 @@
+---
+- name: Instalar o papel de autoridade de certificação (AD CS)
+  ansible.windows.win_feature:
+    name: ADCS-Cert-Authority
+    include_management_tools: true
+    state: present
+
+- name: Configurar a autoridade de certificação da empresa
+  ansible.windows.win_powershell:
+    script: |
+      $caName = '{{ ribeira_ca_name }}'
+      $configured = Test-Path "HKLM:\SYSTEM\CurrentControlSet\Services\CertSvc\Configuration\$caName"
+      if ($configured) {
+          $Ansible.Changed = $false
+          return
+      }
+      Install-AdcsCertificationAuthority -CAType EnterpriseRootCa -CACommonName $caName `
+          -CryptoProviderName 'RSA#Microsoft Software Key Storage Provider' `
+          -KeyLength 2048 -HashAlgorithmName SHA256 `
+          -ValidityPeriod Years -ValidityPeriodUnits 5 -Force
+      $Ansible.Changed = $true
