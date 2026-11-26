@@ -24,6 +24,7 @@ cd lab/ansible
 cp inventory.example.yml inventory.yml     # ajusta os endereços IP ao teu UTM
 export RIBEIRA_LAB_PASSWORD='...'          # palavra-passe do Administrator (mínimo 12 caracteres)
 export RIBEIRA_DSRM_PASSWORD='...'         # palavra-passe do modo de restauro (mínimo 12 caracteres)
+export RIBEIRA_USER_PASSWORD='...'         # palavra-passe dos funcionários, diferente da do Administrator
 
 ../../.venv/bin/ansible windows -m ansible.windows.win_ping   # as duas máquinas respondem "pong"?
 ../../.venv/bin/ansible-playbook site.yml --check --diff       # ensaio: mostra o que mudaria
@@ -48,4 +49,4 @@ Notas:
 
 ## Palavras-passe
 
-Nunca ficam no Git. O Ansible lê-as de variáveis de ambiente (`RIBEIRA_LAB_PASSWORD`, `RIBEIRA_DSRM_PASSWORD`); o ficheiro `inventory.yml` está no `.gitignore`. Usa palavras-passe de laboratório que não uses em mais lado nenhum.
+Nunca ficam no Git. O Ansible lê-as de variáveis de ambiente (`RIBEIRA_LAB_PASSWORD`, `RIBEIRA_DSRM_PASSWORD`, `RIBEIRA_USER_PASSWORD`); o ficheiro `inventory.yml` está no `.gitignore`. A dos funcionários tem de ser diferente da do Administrator: o cenário começa com um funcionário sem privilégios, e o playbook recusa correr se as duas forem iguais. Usa palavras-passe de laboratório que não uses em mais lado nenhum.

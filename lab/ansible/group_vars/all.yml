@@ -14,7 +14,8 @@ ribeira_ca_name: Ribeira-CA
 # Palavras-passe: lidas do ambiente, nunca escritas em ficheiros do Git.
 ribeira_admin_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_LAB_PASSWORD') }}"
 ribeira_dsrm_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_DSRM_PASSWORD') }}"
-ribeira_user_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_LAB_PASSWORD') }}"
+# Os funcionários têm uma palavra-passe própria, diferente da do Administrator.
+ribeira_user_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_USER_PASSWORD') }}"
 
 # Auditorias de que as regras de deteção precisam (nomes em inglês, como no Windows em English).
 ribeira_audit_subcategories:

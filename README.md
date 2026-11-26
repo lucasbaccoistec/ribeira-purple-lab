@@ -78,18 +78,26 @@ hardening/    correções e re-testes
 report/       modelo do relatório e PDF final
 ```
 
-## Plano (provisório, 10 a 12 semanas a part-time)
+## Plano (4 semanas, cerca de 36 horas por semana)
 
-| Semanas | Foco |
-| --- | --- |
-| 0 | Teste de viabilidade: o Mac aguenta as três máquinas? |
-| 1 a 2 | Laboratório como código com Ansible |
-| 3 a 5 | Cadeia de ataque documentada |
-| 6 a 8 | Deteção como código e testes automáticos |
-| 9 a 10 | Correção e prova |
-| 11 a 12 | Relatório, vídeo de 3 minutos e README final |
+Versão completa: 5 falhas propositadas e uma cadeia de ataque de 6 passos. São cerca de 144 horas, 18 delas de folga.
 
-O plano ajusta-se ao resultado da semana 0 (ver [`docs/week-0-log.md`](docs/week-0-log.md)).
+| Semana | Horas | Foco | No fim tem de existir |
+| --- | --- | --- | --- |
+| 1 | 33 + 3 de folga | Teste de viabilidade nos dois primeiros dias (semana 0) e depois o laboratório como código com Ansible | O plano A, B ou C decidido em [`docs/week-0-log.md`](docs/week-0-log.md). O Ansible monta o domínio do zero, com as 5 falhas registadas e aplicadas |
+| 2 | 33 + 3 de folga | Cadeia de ataque documentada, 6 passos | `attack/AT-01` a `AT-06`, cada um com comandos, evidência e técnica ATT&CK, e os eventos exportados |
+| 3 | 30 + 6 de folga | Deteção como código e testes automáticos; começam as correções | 5 a 6 regras Sigma com casos de teste, `make check` a passar e uma ficha de correção por falha |
+| 4 | 30 + 6 de folga | Correção e prova, relatório, vídeo de 3 minutos e README final | O ataque falha depois da correção. Relatório em PDF, vídeo e README prontos |
+
+**Pontos de controlo:** no fim de cada semana confirmo a última coluna da tabela. Se faltar algo, aplico logo o corte seguinte, sem esperar pela semana seguinte.
+
+**Cortes, por esta ordem, se atrasar:**
+
+1. Sai o AD CS (bónus) e o que depende dele: ficam 5 passos e 4 falhas.
+2. Versão núcleo: 4 passos e 3 falhas.
+3. Versão mínima: 3 passos e 2 falhas.
+
+No quarto dia da semana 4 o âmbito congela: só falta provar e escrever. O plano ajusta-se ao resultado do teste de viabilidade (ver [`docs/week-0-log.md`](docs/week-0-log.md)).
 
 ## Aviso legal
 

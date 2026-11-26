@@ -13,9 +13,12 @@
         that:
           - ribeira_admin_password | length >= 12
           - ribeira_dsrm_password | length >= 12
+          - ribeira_user_password | length >= 12
+          - ribeira_user_password != ribeira_admin_password
         fail_msg: >-
-          Define RIBEIRA_LAB_PASSWORD e RIBEIRA_DSRM_PASSWORD no terminal
-          (mínimo 12 caracteres) antes de correr o playbook.
+          Define RIBEIRA_LAB_PASSWORD, RIBEIRA_DSRM_PASSWORD e RIBEIRA_USER_PASSWORD no terminal
+          (mínimo 12 caracteres; a dos funcionários tem de ser diferente da do Administrator)
+          antes de correr o playbook.
         quiet: true
       tags: always
 

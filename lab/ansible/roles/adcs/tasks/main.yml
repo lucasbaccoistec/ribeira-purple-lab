@@ -19,3 +19,19 @@
           -KeyLength 2048 -HashAlgorithmName SHA256 `
           -ValidityPeriod Years -ValidityPeriodUnits 5 -Force
       $Ansible.Changed = $true
+
+# A subcategoria "Certification Services" (role common) não chega sozinha: sem o filtro
+# de auditoria da própria CA, os pedidos e emissões de certificados (4886, 4887) não aparecem.
+- name: Ligar a auditoria da autoridade de certificação (todas as categorias)
+  ansible.windows.win_regedit:
+    path: 'HKLM:\SYSTEM\CurrentControlSet\Services\CertSvc\Configuration\{{ ribeira_ca_name }}'
+    name: AuditFilter
+    data: 127
+    type: dword
+  register: ribeira_ca_audit
+
+- name: Reiniciar a autoridade de certificação para o filtro contar
+  ansible.windows.win_service:
+    name: CertSvc
+    state: restarted
+  when: ribeira_ca_audit is changed

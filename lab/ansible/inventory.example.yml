@@ -4,6 +4,7 @@
 #
 #   export RIBEIRA_LAB_PASSWORD='...'    # palavra-passe do Administrator (DC01 e domínio)
 #   export RIBEIRA_DSRM_PASSWORD='...'   # palavra-passe do modo de restauro do diretório
+#   export RIBEIRA_USER_PASSWORD='...'   # palavra-passe dos funcionários (diferente da do Administrator)
 all:
   children:
     windows:

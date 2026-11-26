@@ -30,7 +30,7 @@ if ($current -notcontains $Forwarder) {
 Write-Host 'A medir a velocidade (regista a segunda execução):'
 1..2 | ForEach-Object {
     $elapsed = Measure-Command { Get-ADUser -Filter * | Out-Null }
-    Write-Host ('  execução {0}: {1:N1} segundos' -f $_, $elapsed.TotalSeconds)
+    Write-Host ('  execução {0}: {1:N2} segundos' -f $_, $elapsed.TotalSeconds)
 }
 
 Write-Host 'Por fim, reinicia (Restart-Computer) e mede o tempo até poderes iniciar sessão.'

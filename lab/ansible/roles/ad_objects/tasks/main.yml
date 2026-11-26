@@ -24,8 +24,10 @@
     password: "{{ ribeira_user_password }}"
     update_password: on_create
     path: "OU={{ item.department }},{{ ribeira_base_dn }}"
+    # "add" e não "set": o "set" tirava o utilizador de todos os outros grupos
+    # e desfazia em silêncio as fraquezas que mexem em grupos.
     groups:
-      set:
+      add:
         - "GRP-{{ item.department }}"
     enabled: true
     state: present

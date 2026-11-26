@@ -2,7 +2,7 @@
 title: "Relatório de teste de intrusão: Ribeira Soluções Digitais, Lda."
 subtitle: "Teste interno ao Active Directory (assumed breach)"
 author: "O Teu Nome"
-date: "Mês de 2027"
+date: "Dezembro de 2026"
 lang: pt-PT
 ---
 

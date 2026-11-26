@@ -30,7 +30,7 @@ flowchart TB
 ```
 
 - As três máquinas estão na rede partilhada do UTM (NAT). Vêem-se umas às outras e saem para a internet; a rede de casa ou da escola não consegue iniciar ligações para elas.
-- Depois de tudo instalado, podes mudar as placas de rede para **Host Only** no UTM e o laboratório fica sem internet durante os ataques. Volta a Shared Network quando precisares de atualizações.
+- Depois de tudo instalado, podes mudar as placas de rede para **Host Only** no UTM e o laboratório fica sem internet durante os ataques. Volta a Shared Network quando precisares de atualizações. Faz isto só depois de confirmares que o DC01 está ativado (SConfig, opção 11): a versão de avaliação tem de se ativar pela internet nos primeiros 10 dias, senão desliga-se sozinha.
 - O DNS do domínio é o próprio DC01 (127.0.0.1), com o 1.1.1.1 como reencaminhador para a internet. O WS01 usa o DC01 como DNS; sem isso não consegue juntar-se ao domínio.
 - O Kerberos recusa ligações se os relógios diferirem mais de 5 minutos. Se o Kali falhar a autenticar, acerta a hora (`sudo ntpdate <endereço do DC01>`).
 

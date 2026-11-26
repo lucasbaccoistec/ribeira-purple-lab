@@ -12,13 +12,21 @@ Organiza por tema, uma pasta por técnica, por exemplo `kerberos/`, `certificado
 Numa linha de comandos de administrador, na máquina onde o evento aconteceu (DC01 ou WS01), exporta só a janela de tempo que interessa. Isto mantém o ficheiro pequeno e evita levar dados que não precisas.
 
 ```powershell
+# A pasta C:\Temp não existe numa instalação nova do Windows: cria-a primeiro.
+New-Item -ItemType Directory -Force C:\Temp | Out-Null
 # Substitui as datas (UTC) pela janela do teu teste e o nome do ficheiro.
 wevtutil epl Security C:\Temp\amostra.evtx /q:"*[System[TimeCreated[@SystemTime>='2026-12-01T10:00:00Z' and @SystemTime<='2026-12-01T10:15:00Z']]]"
 ```
 
 Para eventos do Sysmon, troca `Security` por `Microsoft-Windows-Sysmon/Operational`.
 
-Depois copia o ficheiro para o Mac (por exemplo com a pasta partilhada do UTM) e põe-no nesta pasta.
+Depois traz o ficheiro para o Mac com o Ansible, que já fala com as duas máquinas por WinRM. A pasta partilhada do UTM não serve para o DC01: precisa das ferramentas do UTM (SPICE), que o DC01 não tem. No Mac, a partir de `lab/ansible` e com as variáveis das palavras-passe definidas (ver [`lab/README.md`](../../../lab/README.md)):
+
+```bash
+# Troca DC01 por WS01 se a amostra vier do posto de trabalho, e kerberos pelo tema.
+# Escreve o caminho do Windows com /: num comando destes, "\a" vira um carácter especial.
+../../.venv/bin/ansible DC01 -m ansible.builtin.fetch -a "src=C:/Temp/amostra.evtx dest=../../detections/samples/evtx/kerberos/ flat=yes"
+```
 
 ## Cuidados
 

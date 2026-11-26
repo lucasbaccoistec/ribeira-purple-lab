@@ -30,5 +30,11 @@ if ($result -and $result.ErrorId) {
 }
 Write-Host ('Instalação da autoridade de certificação: {0:N1} minutos' -f $elapsed.TotalMinutes)
 
+# Auditoria da própria autoridade de certificação: sem isto não há eventos de pedidos
+# e emissões de certificados (4886, 4887), mesmo com a auditoria do Windows ligada.
+certutil -setreg CA\AuditFilter 127
+if ($LASTEXITCODE -ne 0) { throw 'O certutil não conseguiu ligar a auditoria da autoridade de certificação.' }
+Restart-Service CertSvc
+
 Get-Service CertSvc | Format-Table Name, Status -AutoSize
 certutil -ping
