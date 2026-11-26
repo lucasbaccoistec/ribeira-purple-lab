@@ -6,9 +6,9 @@ Preenche este ficheiro à medida que segues o guia da semana 0 (o guia fica fora
 
 | Passo | Resultado | Notas |
 | --- | --- | --- |
-| 1. UTM instalado | Por fazer | |
-| 2. Windows Server no DC01 | Por fazer | |
-| 3. Active Directory no DC01 | Por fazer | |
+| 1. UTM instalado | Passou | Já estava instalado (QEMU 10.0). |
+| 2. Windows Server no DC01 | Passou | Server 2022 Standard Evaluation, modo Core. Instalação em 20 min (23:01 a 23:21, 25/11/2026). Nome DC01 e IP fixo 192.168.64.10 feitos no SConfig. |
+| 3. Active Directory no DC01 | Passou | Domínio `ribeira.test` criado em 10 min. NTDS, DNS, Netlogon e Kdc a correr, e o AD continuou a responder depois do reinício. DNS do DC em 127.0.0.1, reencaminhador 1.1.1.1. Cópia `DC01-limpo` feita (7,5 GB). |
 | 4. Certificados (AD CS), bónus | Por fazer | |
 | 5. WS01 no domínio | Por fazer | |
 | 6. Kali | Por fazer | |
@@ -20,10 +20,10 @@ Resultados possíveis: **Por fazer**, **Passou**, **Passou com problemas**, **Fa
 
 | Medida | Limite | O teu valor |
 | --- | --- | --- |
-| Instalar o Windows Server, até poderes entrar | até 120 min | |
-| Criar o AD (`Install-ADDSForest`) | até 90 min | |
-| Arranque do DC01, até poderes entrar | até 15 min | |
-| `Get-ADUser -Filter *`, segunda execução | até 30 s | |
+| Instalar o Windows Server, até poderes entrar | até 120 min | 20 min |
+| Criar o AD (`Install-ADDSForest`) | até 90 min | 10 min, com o reinício (23:59 a 00:09) |
+| Arranque do DC01, até poderes entrar | até 15 min | 1 min 18 s |
+| `Get-ADUser -Filter *`, segunda execução | até 30 s | 0,039 s (a primeira foi 5,49 s) |
 | Instalar o AD CS (bónus) | até 45 min | |
 | As três máquinas ligadas | 30 min sem bloquear | |
 | Pressão da memória do Mac | não fica vermelha | |
