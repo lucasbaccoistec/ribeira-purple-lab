@@ -15,11 +15,14 @@
     reboot: true
   no_log: true
 
+# Em IPv4 e em IPv6 (::1). Sem o ::1 a tarefa dava sempre "changed": o Windows põe o ::1
+# na placa ao criar o domínio e o módulo, a comparar, achava que o IPv6 devia ficar vazio.
 - name: O servidor usa-se a si próprio como DNS
   ansible.windows.win_dns_client:
-    adapter_names: "*"
+    adapter_names: Ethernet
     dns_servers:
       - 127.0.0.1
+      - "::1"
 
 - name: Deixar o DNS do domínio resolver nomes da internet
   ansible.windows.win_powershell:

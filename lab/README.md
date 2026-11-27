@@ -25,6 +25,7 @@ cp inventory.example.yml inventory.yml     # ajusta os endereços IP ao teu UTM
 export RIBEIRA_LAB_PASSWORD='...'          # palavra-passe do Administrator (mínimo 12 caracteres)
 export RIBEIRA_DSRM_PASSWORD='...'         # palavra-passe do modo de restauro (mínimo 12 caracteres)
 export RIBEIRA_USER_PASSWORD='...'         # palavra-passe dos funcionários, diferente da do Administrator
+export no_proxy='*'                         # no macOS: evita que o Ansible rebente ("A worker was found in a dead state")
 
 ../../.venv/bin/ansible windows -m ansible.windows.win_ping   # as duas máquinas respondem "pong"?
 ../../.venv/bin/ansible-playbook site.yml --check --diff       # ensaio: mostra o que mudaria
@@ -33,6 +34,8 @@ export RIBEIRA_USER_PASSWORD='...'         # palavra-passe dos funcionários, di
 
 Notas:
 
+- No macOS, na primeira ligação, o sistema pergunta se o Terminal pode procurar dispositivos na rede local: responde **Permitir**. Sem isso, o Ansible dá "No route to host" (Definições do Sistema → Privacidade e segurança → Rede local).
+- Para não escreveres as palavras-passe no histórico do terminal, define-as com `read -s`, por exemplo: `read -s "RIBEIRA_LAB_PASSWORD?Administrator: "; echo; export RIBEIRA_LAB_PASSWORD`.
 - A palavra-passe do Administrator local do DC01 tem de ser igual a `RIBEIRA_LAB_PASSWORD`: depois de o servidor virar controlador de domínio, essa conta passa a ser a do domínio.
 - O Ansible corre em etapas com tags: `--tags common`, `domain`, `adcs`, `objects`, `workstation`. Põe `ribeira_install_adcs: false` em `group_vars/all.yml` para saltar a autoridade de certificação.
 - Se o ensaio com `--check` falhar em tarefas que dependem de outras (por exemplo, utilizadores antes de o domínio existir), é normal: o modo de ensaio não executa as dependências.
@@ -44,7 +47,8 @@ Notas:
 | Sintaxe do playbook e das roles (`make lab-syntax`) | Sim |
 | Parâmetros de cada tarefa contra a documentação dos módulos | Sim |
 | Estilo YAML (`make lint`) | Sim |
-| Execução real contra o DC01 e o WS01 | **Ainda não**: confirma na primeira execução e corrige o que for preciso |
+| Execução real contra o DC01 e o WS01 | Sim, em 27/11/2026: sem erros, e a segunda execução completa deu `changed=0` nas duas máquinas |
+| Montar o domínio a partir de um servidor acabado de instalar | Ainda não: o domínio desta vez foi criado à mão (semana 0) |
 | Scripts PowerShell | Só a sintaxe; a execução real faz-se na semana 0 |
 
 ## Palavras-passe
