@@ -4,7 +4,7 @@
 
 | | |
 | --- | --- |
-| **Fraqueza ligada** | VULN-000 (ver `docs/vulnerability-register.md`) |
+| **Vulnerabilidade ligada** | VULN-000 (ver `docs/vulnerability-register.md`) |
 | **Técnica ATT&CK** | T0000, nome da técnica (https://attack.mitre.org/techniques/T0000/) |
 | **Tática** | |
 | **Máquina de origem → destino** | KALI → DC01 |

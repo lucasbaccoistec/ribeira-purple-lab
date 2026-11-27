@@ -25,7 +25,7 @@
     update_password: on_create
     path: "OU={{ item.department }},{{ ribeira_base_dn }}"
     # "add" e não "set": o "set" tirava o utilizador de todos os outros grupos
-    # e desfazia em silêncio as fraquezas que mexem em grupos.
+    # e desfazia em silêncio as vulnerabilidades que mexem em grupos.
     groups:
       add:
         - "GRP-{{ item.department }}"

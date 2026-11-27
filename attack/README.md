@@ -6,7 +6,7 @@ Aqui documentas, passo a passo, o caminho do atacante: do utilizador normal no W
 
 ## Como trabalhar cada passo
 
-1. Escolhe uma fraqueza do [registo](../docs/vulnerability-register.md) e faz uma cópia limpa das máquinas.
+1. Escolhe uma vulnerabilidade do [registo](../docs/vulnerability-register.md) e faz uma cópia limpa das máquinas.
 2. Faz o passo e escreve o ficheiro `AT-NN-nome.md` **enquanto o fazes**: o que tentaste, o que falhou, o que funcionou.
 3. Guarda a evidência em `attack/evidence/AT-NN/` (o Git ignora as pastas vazias; põe lá pelo menos um `.gitkeep` se ficar vazia).
 4. Anota o que o defensor viu (eventos) e passa para a deteção em [`../detections/`](../detections/README.md).

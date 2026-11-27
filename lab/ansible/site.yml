@@ -45,8 +45,8 @@
     - role: workstation
       tags: workstation
 
-# As fraquezas propositadas só entram quando as definires (ver docs/vulnerability-register.md).
-- name: Fraquezas propositadas da Ribeira
+# As vulnerabilidades propositadas só entram quando as definires (ver docs/vulnerability-register.md).
+- name: Vulnerabilidades propositadas da Ribeira
   hosts: domain_controllers:workstations
   roles:
     - role: misconfigurations
