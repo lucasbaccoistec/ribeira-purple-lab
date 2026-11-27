@@ -56,3 +56,6 @@ ribeira_weak_vuln_001: true
 # Palavra-passe fraca (crackável) e forte, lidas do ambiente — nunca no Git.
 ribeira_svc_weak_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_SVC_WEAK_PASSWORD') }}"
 ribeira_svc_strong_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_SVC_STRONG_PASSWORD') }}"
+
+# VULN-002 (ACL perigosa): grupo de suporte com poder de repor palavras-passe.
+ribeira_weak_vuln_002: true

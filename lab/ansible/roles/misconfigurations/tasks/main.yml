@@ -7,48 +7,128 @@
 # Assim "Corrigir e Provar" é só mudar o interruptor e voltar a correr o mesmo playbook.
 # Nunca ponhas palavras-passe nem chaves no Git: lê-as do ambiente (ver group_vars/all.yml).
 #
-# Esta role só corre quando pedires de propósito (a tag "never" no site.yml):
+# Esta role corre no DC01 e no WS01; cada bloco escolhe a máquina certa com um "when".
+# Só corre quando pedires de propósito (a tag "never" no site.yml):
 #   ansible-playbook site.yml --tags misconfigurations   # todas
 #   ansible-playbook site.yml --tags vuln_001            # só a VULN-001
 
 # ═══ VULN-001 — Kerberoasting ═══════════════════════════════════════════════
-# Conta de serviço com SPN e palavra-passe fraca. A conta e o SPN existem
-# sempre (um serviço precisa deles); o interruptor muda só a força da
-# palavra-passe e a cifra permitida (RC4 fraca, 4, ⇄ AES forte, 24).
-- name: 'VULN-001 | Confirmar a palavra-passe da conta de serviço no ambiente'
-  ansible.builtin.assert:
-    that:
-      - not (ribeira_weak_vuln_001 | bool) or (ribeira_svc_weak_password | length >= 8)
-      - (ribeira_weak_vuln_001 | bool) or (ribeira_svc_strong_password | length >= 20)
-    fail_msg: >-
-      Define RIBEIRA_SVC_WEAK_PASSWORD (estado vulnerável) ou
-      RIBEIRA_SVC_STRONG_PASSWORD (estado corrigido, 20+ caracteres) no ambiente.
-    quiet: true
+# Conta de serviço com SPN e palavra-passe fraca. É um objeto do domínio, por
+# isso corre só no controlador de domínio. A conta e o SPN existem sempre (um
+# serviço precisa deles); o interruptor muda só a força da palavra-passe e a
+# cifra permitida (RC4 fraca, 4, ⇄ AES forte, 24).
+- name: 'VULN-001 — Kerberoasting (só no controlador de domínio)'
+  when: inventory_hostname in groups['domain_controllers']
   tags: [vuln_001]
+  block:
+    - name: 'VULN-001 | Confirmar a palavra-passe da conta de serviço no ambiente'
+      ansible.builtin.assert:
+        that:
+          - not (ribeira_weak_vuln_001 | bool) or (ribeira_svc_weak_password | length >= 8)
+          - (ribeira_weak_vuln_001 | bool) or (ribeira_svc_strong_password | length >= 20)
+        fail_msg: >-
+          Define RIBEIRA_SVC_WEAK_PASSWORD (estado vulnerável) ou
+          RIBEIRA_SVC_STRONG_PASSWORD (estado corrigido, 20+ caracteres) no ambiente.
+        quiet: true
 
-- name: 'VULN-001 | Conta de serviço svc-backup (SPN + palavra-passe)'
-  microsoft.ad.user:
-    name: svc-backup
-    sam_account_name: svc-backup
-    upn: "svc-backup@{{ ribeira_domain }}"
-    description: Conta de servico do backup SQL (laboratorio Ribeira)
-    path: "CN=Users,{{ ribeira_base_dn }}"
-    spn:
-      set:
-        - "MSSQLSvc/backup.{{ ribeira_domain }}:1433"
-    password: "{{ ribeira_svc_weak_password if ribeira_weak_vuln_001 | bool else ribeira_svc_strong_password }}"
-    update_password: always
-    attributes:
-      set:
-        msDS-SupportedEncryptionTypes: "{{ (4 if ribeira_weak_vuln_001 | bool else 24) | int }}"
-    enabled: true
-    state: present
-  no_log: true
-  tags: [vuln_001]
+    - name: 'VULN-001 | Conta de serviço svc-backup (SPN + palavra-passe)'
+      microsoft.ad.user:
+        name: svc-backup
+        sam_account_name: svc-backup
+        upn: "svc-backup@{{ ribeira_domain }}"
+        description: Conta de servico do backup SQL (laboratorio Ribeira)
+        path: "CN=Users,{{ ribeira_base_dn }}"
+        spn:
+          set:
+            - "MSSQLSvc/backup.{{ ribeira_domain }}:1433"
+        password: "{{ ribeira_svc_weak_password if ribeira_weak_vuln_001 | bool else ribeira_svc_strong_password }}"
+        update_password: always
+        attributes:
+          set:
+            msDS-SupportedEncryptionTypes: "{{ (4 if ribeira_weak_vuln_001 | bool else 24) | int }}"
+        enabled: true
+        state: present
+      no_log: true
 
-- name: 'Resumo das vulnerabilidades aplicadas'
-  ansible.builtin.debug:
-    msg: >-
-      VULN-001 (Kerberoasting): svc-backup com SPN —
-      {{ 'VULNERÁVEL (RC4 + palavra-passe fraca)' if ribeira_weak_vuln_001 | bool else 'CORRIGIDA (AES + palavra-passe forte)' }}
-  tags: [vuln_001]
+    - name: 'VULN-001 | Resumo'
+      ansible.builtin.debug:
+        msg: >-
+          VULN-001 (Kerberoasting): svc-backup com SPN —
+          {{ 'VULNERÁVEL (RC4 + palavra-passe fraca)' if ribeira_weak_vuln_001 | bool else 'CORRIGIDA (AES + palavra-passe forte)' }}
+
+# ═══ VULN-002 — ACL perigosa (ForceChangePassword) ══════════════════════════
+# O grupo de suporte "Suporte-TI" (onde está a svc-backup) pode repor a
+# palavra-passe da conta de administrador "adm.ti". Os grupos e as contas
+# existem sempre; o interruptor só acrescenta ou tira o direito perigoso.
+- name: 'VULN-002 — ACL perigosa (só no controlador de domínio)'
+  when: inventory_hostname in groups['domain_controllers']
+  tags: [vuln_002]
+  block:
+    - name: 'VULN-002 | Grupo de suporte Suporte-TI (com a svc-backup)'
+      microsoft.ad.group:
+        name: Suporte-TI
+        scope: global
+        path: "OU=TI,{{ ribeira_base_dn }}"
+        members:
+          add:
+            - svc-backup
+        state: present
+
+    - name: 'VULN-002 | Grupo Admins-TI'
+      microsoft.ad.group:
+        name: Admins-TI
+        scope: global
+        path: "OU=TI,{{ ribeira_base_dn }}"
+        state: present
+
+    - name: 'VULN-002 | Conta de administrador adm.ti (alvo da ACL)'
+      microsoft.ad.user:
+        name: adm.ti
+        sam_account_name: adm.ti
+        upn: "adm.ti@{{ ribeira_domain }}"
+        description: Administrador de TI (laboratorio Ribeira)
+        path: "OU=TI,{{ ribeira_base_dn }}"
+        password: "{{ ribeira_user_password }}"
+        update_password: on_create
+        groups:
+          add:
+            - Admins-TI
+        enabled: true
+        state: present
+      no_log: true
+
+    - name: 'VULN-002 | Direito de repor a palavra-passe de adm.ti para o Suporte-TI'
+      ansible.windows.win_powershell:
+        script: |
+          Import-Module ActiveDirectory -ErrorAction Stop
+          $weak   = ${{ 'true' if ribeira_weak_vuln_002 | bool else 'false' }}
+          $target = Get-ADUser -Identity 'adm.ti'
+          $group  = Get-ADGroup -Identity 'Suporte-TI'
+          $sid    = [System.Security.Principal.SecurityIdentifier]$group.SID
+          # User-Force-Change-Password (direito estendido)
+          $guid   = [GUID]'00299570-246d-11d0-a768-00aa006e0529'
+          $path   = "AD:\$($target.DistinguishedName)"
+          $acl    = Get-Acl -Path $path
+          $match  = @($acl.Access | Where-Object {
+              $_.ObjectType -eq $guid -and
+              $_.ActiveDirectoryRights.ToString().Contains('ExtendedRight') -and
+              $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]) -eq $sid
+          })
+          if ($weak -and $match.Count -eq 0) {
+              $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($sid, 'ExtendedRight', 'Allow', $guid)
+              $acl.AddAccessRule($ace)
+              Set-Acl -Path $path -AclObject $acl
+              $Ansible.Changed = $true
+          } elseif (-not $weak -and $match.Count -gt 0) {
+              foreach ($ace in $match) { $null = $acl.RemoveAccessRule($ace) }
+              Set-Acl -Path $path -AclObject $acl
+              $Ansible.Changed = $true
+          } else {
+              $Ansible.Changed = $false
+          }
+
+    - name: 'VULN-002 | Resumo'
+      ansible.builtin.debug:
+        msg: >-
+          VULN-002 (ACL perigosa): Suporte-TI → repor palavra-passe de adm.ti —
+          {{ 'VULNERÁVEL (direito concedido)' if ribeira_weak_vuln_002 | bool else 'CORRIGIDA (direito removido)' }}
