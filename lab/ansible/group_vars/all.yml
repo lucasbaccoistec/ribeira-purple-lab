@@ -47,3 +47,12 @@ ribeira_users:
   - { sam: carla.sousa, first: Carla, last: Sousa, department: RecursosHumanos }
   - { sam: diogo.lopes, first: Diogo, last: Lopes, department: Comercial }
   - { sam: eva.martins, first: Eva, last: Martins, department: TI }
+
+# ─── Vulnerabilidades propositadas (ver docs/vulnerability-register.md) ───
+# Cada uma liga-se por um interruptor ribeira_weak_<id>: true = vulnerável, false = corrigida.
+
+# VULN-001 (Kerberoasting): conta de serviço svc-backup com SPN.
+ribeira_weak_vuln_001: true
+# Palavra-passe fraca (crackável) e forte, lidas do ambiente — nunca no Git.
+ribeira_svc_weak_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_SVC_WEAK_PASSWORD') }}"
+ribeira_svc_strong_password: "{{ lookup('ansible.builtin.env', 'RIBEIRA_SVC_STRONG_PASSWORD') }}"
