@@ -237,3 +237,31 @@
         msg: >-
           VULN-004 (protocolos sem proteção): LLMNR/NBT-NS + NTLMv1 no WS01 —
           {{ 'VULNERÁVEL (ativos)' if ribeira_weak_vuln_004 | bool else 'CORRIGIDA (desligados, NTLMv2 só)' }}
+
+# ═══ VULN-005 — Delegação sem restrições (unconstrained) ════════════════════
+# Marca o computador WS01 como "de confiança para delegação" — algo que só os
+# controladores de domínio deviam ter. O interruptor liga/desliga a marca.
+# Quem controlar o WS01 com esta marca e obrigar o DC a autenticar-se nele
+# apanha o bilhete do DC e fica dono do domínio (ataque: semana 2).
+- name: 'VULN-005 — Delegação sem restrições (só no controlador de domínio)'
+  when: inventory_hostname in groups['domain_controllers']
+  tags: [vuln_005]
+  block:
+    - name: 'VULN-005 | WS01 de confiança para delegação (unconstrained)'
+      ansible.windows.win_powershell:
+        script: |
+          Import-Module ActiveDirectory -ErrorAction Stop
+          $weak = ${{ 'true' if ribeira_weak_vuln_005 | bool else 'false' }}
+          $c = Get-ADComputer -Identity 'WS01' -Properties TrustedForDelegation
+          if ($c.TrustedForDelegation -ne $weak) {
+              Set-ADComputer -Identity 'WS01' -TrustedForDelegation $weak
+              $Ansible.Changed = $true
+          } else {
+              $Ansible.Changed = $false
+          }
+
+    - name: 'VULN-005 | Resumo'
+      ansible.builtin.debug:
+        msg: >-
+          VULN-005 (delegação sem restrições): WS01 —
+          {{ 'VULNERÁVEL (de confiança para delegação)' if ribeira_weak_vuln_005 | bool else 'CORRIGIDA (sem delegação)' }}

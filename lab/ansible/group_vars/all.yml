@@ -65,3 +65,6 @@ ribeira_weak_vuln_003: true
 
 # VULN-004 (protocolos sem proteção): LLMNR/NBT-NS e NTLMv1 ativos no WS01.
 ribeira_weak_vuln_004: true
+
+# VULN-005 (delegação): WS01 marcado como de confiança para delegação (unconstrained).
+ribeira_weak_vuln_005: true
