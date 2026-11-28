@@ -62,3 +62,6 @@ ribeira_weak_vuln_002: true
 
 # VULN-003 (AD CS ESC1): modelo de certificado que deixa o utilizador escolher o nome.
 ribeira_weak_vuln_003: true
+
+# VULN-004 (protocolos sem proteção): LLMNR/NBT-NS e NTLMv1 ativos no WS01.
+ribeira_weak_vuln_004: true

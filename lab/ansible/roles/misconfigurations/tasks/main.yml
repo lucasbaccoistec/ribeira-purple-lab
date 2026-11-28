@@ -192,3 +192,48 @@
         msg: >-
           VULN-003 (AD CS ESC1): modelo RibeiraVPN —
           {{ 'VULNERÁVEL (o pedido diz o nome)' if ribeira_weak_vuln_003 | bool else 'CORRIGIDA (nome a partir do AD)' }}
+
+# ═══ VULN-004 — Protocolos sem proteção (LLMNR/NBT-NS + NTLMv1) ══════════════
+# Definições de registo no WS01. O interruptor liga (vulnerável) ou desliga
+# (corrigido) a resolução de nomes antiga e o envio de NTLMv1.
+# Nota: a captura em si (Responder) é um ataque de rede sem evento limpo no
+# Windows; a deteção agarra-se ao uso de NTLMv1 (evento 4624).
+- name: 'VULN-004 — Protocolos sem proteção (só no posto de trabalho)'
+  when: inventory_hostname in groups['workstations']
+  tags: [vuln_004]
+  block:
+    - name: 'VULN-004 | LLMNR (resolução multicast de nomes)'
+      ansible.windows.win_regedit:
+        path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient
+        name: EnableMulticast
+        data: "{{ 1 if ribeira_weak_vuln_004 | bool else 0 }}"
+        type: dword
+
+    - name: 'VULN-004 | NTLMv1 permitido (LmCompatibilityLevel)'
+      ansible.windows.win_regedit:
+        path: HKLM:\SYSTEM\CurrentControlSet\Control\Lsa
+        name: LmCompatibilityLevel
+        data: "{{ 2 if ribeira_weak_vuln_004 | bool else 5 }}"
+        type: dword
+
+    - name: 'VULN-004 | NBT-NS (NetBIOS over TCP/IP) em todas as placas'
+      ansible.windows.win_powershell:
+        script: |
+          $weak = ${{ 'true' if ribeira_weak_vuln_004 | bool else 'false' }}
+          $val  = if ($weak) { 1 } else { 2 }   # 1 = ativo, 2 = desativado
+          $base = 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces'
+          $changed = $false
+          Get-ChildItem -Path $base | Where-Object { $_.PSChildName -like 'Tcpip_*' } | ForEach-Object {
+              $cur = (Get-ItemProperty -Path $_.PSPath -Name NetbiosOptions -ErrorAction SilentlyContinue).NetbiosOptions
+              if ($cur -ne $val) {
+                  Set-ItemProperty -Path $_.PSPath -Name NetbiosOptions -Value $val -Type DWord
+                  $changed = $true
+              }
+          }
+          $Ansible.Changed = $changed
+
+    - name: 'VULN-004 | Resumo'
+      ansible.builtin.debug:
+        msg: >-
+          VULN-004 (protocolos sem proteção): LLMNR/NBT-NS + NTLMv1 no WS01 —
+          {{ 'VULNERÁVEL (ativos)' if ribeira_weak_vuln_004 | bool else 'CORRIGIDA (desligados, NTLMv2 só)' }}
