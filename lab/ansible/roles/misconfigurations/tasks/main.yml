@@ -132,3 +132,63 @@
         msg: >-
           VULN-002 (ACL perigosa): Suporte-TI → repor palavra-passe de adm.ti —
           {{ 'VULNERÁVEL (direito concedido)' if ribeira_weak_vuln_002 | bool else 'CORRIGIDA (direito removido)' }}
+
+# ═══ VULN-003 — AD CS ESC1 ══════════════════════════════════════════════════
+# Modelo de certificado "RibeiraVPN" clonado do "User". O modelo existe sempre
+# (certificados de VPN são legítimos); o interruptor muda só a flag do nome:
+#   vulnerável → "enrollee_supplies_subject" (o pedido diz o nome: ESC1)
+#   corrigido  → nome construído a partir do AD (cada um só pode pedir para si)
+- name: 'VULN-003 — AD CS ESC1 (só no controlador de domínio)'
+  when: inventory_hostname in groups['domain_controllers']
+  tags: [vuln_003]
+  block:
+    - name: 'VULN-003 | Modelo de certificado RibeiraVPN'
+      microsoft.ad.cs_template:
+        name: RibeiraVPN
+        display_name: Ribeira VPN
+        source_template: User
+        schema_version: 2
+        key_size: 2048
+        extended_key_usages:
+          - client_authentication
+        certificate_name_flag: >-
+          {{ ['enrollee_supplies_subject']
+             if ribeira_weak_vuln_003 | bool
+             else ['subject_require_directory_path', 'subject_alt_require_upn'] }}
+        publish_to_ca:
+          - Ribeira-CA
+        state: present
+
+    - name: 'VULN-003 | Permitir que os utilizadores do domínio peçam o certificado'
+      ansible.windows.win_powershell:
+        script: |
+          Import-Module ActiveDirectory -ErrorAction Stop
+          $configNC = (Get-ADRootDSE).configurationNamingContext
+          $tmplDN   = "CN=RibeiraVPN,CN=Certificate Templates,CN=Public Key Services,CN=Services,$configNC"
+          $grp      = Get-ADGroup -Identity 'Domain Users'
+          $sid      = [System.Security.Principal.SecurityIdentifier]$grp.SID
+          # Certificate-Enrollment (direito estendido de pedir certificados)
+          $enroll   = [GUID]'0e10c968-78fb-11d2-90d4-00c04f79dc55'
+          $path     = "AD:\$tmplDN"
+          $acl      = Get-Acl -Path $path
+          $has = @($acl.Access | Where-Object {
+              $_.ObjectType -eq $enroll -and
+              $_.ActiveDirectoryRights.ToString().Contains('ExtendedRight') -and
+              $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]) -eq $sid
+          })
+          if ($has.Count -eq 0) {
+              $aceEnroll = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($sid, 'ExtendedRight', 'Allow', $enroll)
+              $aceRead   = New-Object System.DirectoryServices.ActiveDirectoryAccessRule($sid, 'GenericRead', 'Allow')
+              $acl.AddAccessRule($aceEnroll)
+              $acl.AddAccessRule($aceRead)
+              Set-Acl -Path $path -AclObject $acl
+              $Ansible.Changed = $true
+          } else {
+              $Ansible.Changed = $false
+          }
+
+    - name: 'VULN-003 | Resumo'
+      ansible.builtin.debug:
+        msg: >-
+          VULN-003 (AD CS ESC1): modelo RibeiraVPN —
+          {{ 'VULNERÁVEL (o pedido diz o nome)' if ribeira_weak_vuln_003 | bool else 'CORRIGIDA (nome a partir do AD)' }}
